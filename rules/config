@@ -223,5 +223,8 @@ INCLUDE_MUX = y
 # reset default container registry from dockerhub to other
 DEFAULT_CONTAINER_REGISTRY ?=
 
+# INCLUDE_SYSLOG - include syslog into sonic image
+INCLUDE_SYSLOG = y
+
 # INCLUDE_RADIUS - build and install radius package
 INCLUDE_RADIUS = y
