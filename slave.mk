@@ -324,7 +324,7 @@ $(info "INCLUDE_KUBERNETES"              : "$(INCLUDE_KUBERNETES)")
 $(info "INCLUDE_MACSEC"                  : "$(INCLUDE_MACSEC)")
 $(info "INCLUDE_MUX"                     : "$(INCLUDE_MUX)")
 $(info "INCLUDE_SYSLOG"                  : "$(INCLUDE_SYSLOG)")
-$(info "INCLUDE_RADIUS"                     : "$(INCLUDE_RADIUS)")
+$(info "INCLUDE_RADIUS"                  : "$(INCLUDE_RADIUS)")
 $(info "INCLUDE_NTP"                     : "$(INCLUDE_NTP)")
 $(info "INCLUDE_LLDP"                    : "$(INCLUDE_LLDP)")
 $(info "INCLUDE_SNMP"                    : "$(INCLUDE_SNMP)")
@@ -334,6 +334,7 @@ $(info "INCLUDE_BGP"                     : "$(INCLUDE_BGP)")
 $(info "INCLUDE_SWSS"                    : "$(INCLUDE_SWSS)")
 $(info "INCLUDE_PMON"                    : "$(INCLUDE_PMON)")
 $(info "INCLUDE_DATABASE"                : "$(INCLUDE_DATABASE)")
+$(info "INCLUDE_SSH"                     : "$(INCLUDE_SSH)")
 $(info "TELEMETRY_WRITABLE"              : "$(TELEMETRY_WRITABLE)")
 $(info "ENABLE_AUTO_TECH_SUPPORT"        : "$(ENABLE_AUTO_TECH_SUPPORT)")
 $(info "PDDF_SUPPORT"                    : "$(PDDF_SUPPORT)")
@@ -1041,6 +1042,7 @@ $(addprefix $(TARGET_PATH)/, $(SONIC_INSTALLERS)) : $(TARGET_PATH)/% : \
 	export include_p4rt="$(INCLUDE_P4RT)"
 	export include_sflow="$(INCLUDE_SFLOW)"
 	export include_radius="$(INCLUDE_RADIUS)"
+	export include_ssh="$(INCLUDE_SSH)"
 	export enable_auto_tech_support="$(ENABLE_AUTO_TECH_SUPPORT)"
 	export include_macsec="$(INCLUDE_MACSEC)"
 	export include_ntp="$(INCLUDE_NTP)"
@@ -1223,6 +1225,7 @@ $(addprefix $(TARGET_PATH)/, $(SONIC_INSTALLERS)) : $(TARGET_PATH)/% : \
 		MULTIARCH_QEMU_ENVIRON=$(MULTIARCH_QEMU_ENVIRON) \
 		INCLUDE_NTP=$(INCLUDE_NTP) \
 		INCLUDE_SYSLOG=$(INCLUDE_SYSLOG) \
+		INCLUDE_SSH=$(INCLUDE_SSH) \
 			./build_debian.sh $(LOG)
 
 		USERNAME="$(USERNAME)" \
