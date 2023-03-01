@@ -212,25 +212,25 @@ endef
 ## Disable some tests from sonic-utilities
 ###############################################################################
 define disable_unused_tests
-    if [ $INCLUDE_NTP == n ]; then
-        DISABLED_TESTS+=("not NTP")
+    if [ $(INCLUDE_NTP) == n ]; then
+        DISABLED_TESTS+="not NTP"
     fi
 
-    if [ $INCLUDE_RADIUS == n ]; then
-        DISABLED_TESTS+=("not RADIUS")
+    if [ $(INCLUDE_RADIUS) == n ]; then
+        if [[ -v DISABLED_TESTS ]]; then
+            DISABLED_TESTS+=" and "
+        fi
+        DISABLED_TESTS+="not RADIUS"
     fi
 
-    if [ $INCLUDE_SNMP == n ]; then
-        DISABLED_TESTS+=("not SNMP")
+    if [ $(INCLUDE_SNMP) == n ]; then
+        if [[ -v DISABLED_TESTS ]]; then
+            DISABLED_TESTS+=" and "
+        fi
+        DISABLED_TESTS+="not SNMP"
     fi
 
-    # Generate string with disabling tests
-    # E.g: "not NTP and not RADIUS and not SNMP"
-    delimiter=" and "
-    printf -v joined_array "%s${delimiter}" "${DISABLED_TESTS[@]}"
-    joined_array=${joined_array%${delimiter}}
-
-    if test -n "$DISABLED_TESTS"; then
-        export PYTEST_ADDOPTS+="-k \"${joined_array}\" "
+    if [[ -v DISABLED_TESTS ]]; then
+        export PYTEST_ADDOPTS+="-k \"$${DISABLED_TESTS}\" "
     fi
 endef
