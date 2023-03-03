@@ -596,6 +596,12 @@ j2 files/build_templates/sonic_version.yml.j2 | sudo tee $FILESYSTEM_ROOT/etc/so
 ## Metadata file
 export configured_arch="${CONFIGURED_ARCH}"
 export configured_platform="${CONFIGURED_PLATFORM}"
+export build_id="${BUILD_ID}"
+export build_timestamp="$(date +%s)"
+export base_branch_channel="${BASE_BRANCH_CHANNEL}"
+export git_remote="$(git config --get remote.origin.url)"
+export image_usecase="${IMAGE_USECASE}"
+export image_options="${IMAGE_OPTIONS}"
 
 ./build_img_metadata.py
 if [ -f ./build_metadata.yaml ]; then
