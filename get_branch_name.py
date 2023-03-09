@@ -7,7 +7,10 @@ def get_branch_by_hash():
     try:
         branch = os.environ.get('branch', "HEAD")
         commit = os.environ.get('commit_id')
-        # commit = "f84e1cea5"
+
+        # Skip. No reason to find branch if repo is already on it
+        if branch != "HEAD":
+            print(branch)
 
         contains = subprocess.check_output(['git', 'branch', '--contains', commit])
 
@@ -17,8 +20,7 @@ def get_branch_by_hash():
         # clean elements (remove empty, remove trailing)
         contains_lst.remove("")
         for idx, _ in enumerate(contains_lst):
-            contains_lst[idx] = contains_lst[idx].replace("*", "")
-            contains_lst[idx] = contains_lst[idx].strip()
+            contains_lst[idx] = contains_lst[idx].replace("*", "").strip()
 
         # Branch can be defined by commit just in case if "git branch --contains"
         # returns 2 strings: 1st is "(HEAD detached at {hash})" and 2nd is a branch name.

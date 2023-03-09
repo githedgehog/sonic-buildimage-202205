@@ -587,8 +587,7 @@ export asic_type="${sonic_asic_platform}"
 export asic_subtype="${TARGET_MACHINE}"
 export commit_id="$(git rev-parse --short HEAD)"
 export branch="$(git rev-parse --abbrev-ref HEAD)"
-if [ "$branch" == "HEAD" ]
-then
+if [ "$branch" == "HEAD" ]; then
     # Try to find branch by hash
     export branch=$(./get_branch_name.py)
 fi
