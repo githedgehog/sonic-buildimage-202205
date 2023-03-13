@@ -388,6 +388,10 @@ SONIC_BUILD_INSTRUCTION :=  make \
                            SONIC_SLAVE_DOCKER_DRIVER=$(SONIC_SLAVE_DOCKER_DRIVER) \
                            MIRROR_URLS=$(MIRROR_URLS) \
                            MIRROR_SECURITY_URLS=$(MIRROR_SECURITY_URLS) \
+                           BUILD_ID=$(BUILD_ID) \
+                           BASE_BRANCH_CHANNEL=$(BASE_BRANCH_CHANNEL) \
+                           IMAGE_USECASE=$(IMAGE_USECASE) \
+                           IMAGE_OPTIONS=$(IMAGE_OPTIONS) \
                            $(SONIC_OVERRIDE_BUILD_VARS)
 
 .PHONY: sonic-slave-build sonic-slave-bash init reset

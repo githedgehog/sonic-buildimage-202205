@@ -18,15 +18,34 @@ IMG_METADATA_FILE = 'build_metadata.yaml'
 def get_header_info():
     hdr_data = {}
     hdr_data ['SONiC_Software_Version'] = os.environ.get('build_version')
-    hdr_data['Distribution'] = os.environ.get('debian_version')
-    hdr_data['Kernel'] = os.environ.get('kernel_version')
-    hdr_data['Build_branch'] = os.environ.get('branch')
-    hdr_data['Build_commit'] = os.environ.get('commit_id')
-    hdr_data['Build_date'] = os.environ.get('build_date')
-    hdr_data['Architecture'] = os.environ.get('configured_arch')
-    hdr_data['Platform'] = os.environ.get('configured_platform')
+    hdr_data['distribution'] = os.environ.get('debian_version')
+    hdr_data['kernel'] = os.environ.get('kernel_version')
+    hdr_data['build_date'] = os.environ.get('build_date')
 
     return hdr_data
+
+# Get git related info (remote repository, branch name, commit)
+
+def get_git_info():
+    git_data = {}
+    git_data ['repo'] = os.environ.get('git_remote')
+    git_data['branch'] = os.environ.get('branch')
+    git_data['ref'] = os.environ.get('commit_id')
+
+    return git_data
+
+# Get image spec info (platform, arch, usecase, options)
+
+def get_spec_info():
+    spec_data = {}
+    spec_data ['platform'] = os.environ.get('configured_platform')
+    spec_data['arch'] = os.environ.get('configured_arch')
+    spec_data['usecase'] = os.environ.get('image_usecase')
+    usecase = os.environ.get('image_options')
+
+    spec_data['options'] = usecase.split()
+
+    return spec_data
 
 # Read config file by a given path, create dictionary
 
@@ -60,30 +79,22 @@ def get_bld_config():
 
     return bld_config
 
-# Get features list
-# get features list and status according to build configuration
-
-def get_features_list(features_list_path:str):
-    feature_list = {}
-
-    if os.path.exists(features_list_path) is False:
-        return
-
-    with open(features_list_path) as feature_yaml:
-        feature_list = yaml.safe_load(feature_yaml)
-
-    return feature_list
-
 # Write build metadata into yaml file
 
 def write_matadata(path:str):
     bld_metadata = {}
 
-    bld_metadata['Version'] = get_header_info()
-    bld_metadata['Configuration'] = get_bld_config()
+    bld_metadata['id'] = os.environ.get('build_id')
+    bld_metadata['date'] = int(os.environ.get('build_timestamp'))
+    bld_metadata['channel'] = os.environ.get('base_branch_channel')
+
+    bld_metadata['git'] = get_git_info()
+    bld_metadata['spec'] = get_spec_info()
+    bld_metadata['version'] = get_header_info()
+    bld_metadata['configuration'] = get_bld_config()
 
     with open(path, 'w') as file:
-        yaml.dump(bld_metadata, file)
+        yaml.dump(bld_metadata, file, sort_keys=False)
 
 def build_metadata():
     write_matadata(IMG_METADATA_FILE)
