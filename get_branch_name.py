@@ -8,6 +8,10 @@ def get_branch_by_hash():
         branch = os.environ.get('branch', "HEAD")
         commit = os.environ.get('commit_id')
 
+        # get HEAD commit hash if no var commit_id
+        if commit is None:
+            commit = subprocess.check_output(['git', 'rev-parse', '--short', 'HEAD']).decode("utf-8").replace("\n", "")
+
         # Skip. No reason to find branch if repo is already on it
         if branch != "HEAD":
             print(branch)
