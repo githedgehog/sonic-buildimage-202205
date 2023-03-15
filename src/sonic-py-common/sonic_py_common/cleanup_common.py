@@ -53,7 +53,7 @@ def read_metadata_conifg(key_pattern = "", value_pattern = "", path = None):
     if os.path.exists(path) is True:
         with open(path) as file:
             config = yaml.safe_load(file)
-        config = config['Configuration']
+        config = config['configuration']
     # probably this is build unit test
     # read rules/config from sonic-buildimage
     else:
