@@ -70,4 +70,3 @@ sonic_get_version() {
         echo "${branch_name}.${BUILD_NUMBER}${dirty:--$(git rev-parse --short HEAD)}" | sed 's/\//_/g'
     fi
 }
-sonic_get_version
