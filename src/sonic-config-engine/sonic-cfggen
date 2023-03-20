@@ -25,6 +25,7 @@ import netaddr
 import os
 import sys
 import yaml
+import syslog
 
 from collections import OrderedDict
 from config_samples import generate_sample_config, get_available_config
@@ -229,8 +230,50 @@ def _process_json(args, data):
     Process JSON file and update switch configuration data
     """
     for json_file in args.json:
-        with open(json_file, 'r') as stream:
-            deep_update(data, FormatConverter.to_deserialized(json.load(stream)))
+        try:
+            with open(json_file, 'r') as stream:
+                deep_update(data, FormatConverter.to_deserialized(json.load(stream)))
+        except:
+            err_msg = f"Error occured while processing {json_file} file"
+            syslog.syslog(syslog.LOG_ERR, err_msg)
+            print(err_msg)
+
+def _process_yang(args, data):
+    """
+    Process YANG file and update switch configuration data
+    """
+    if args.yang is not None:
+        try:
+            #TODO: Remove this check onces SONiC moves to python3.x
+            if PY3x:
+                yang_file = args.yang
+                config_db_json = SonicYangCfgDbGenerator().generate_config(
+                    yang_data_file=yang_file)
+                deep_update(data, config_db_json)
+            else:
+                print('-Y/--yang option is not available in Python2', file=sys.stderr)
+                sys.exit(1)
+        except:
+            err_msg = f"Error occured while processing {yang_file} file"
+            syslog.syslog(syslog.LOG_ERR, err_msg)
+            print(err_msg)
+
+def _process_yaml(args, data):
+    """
+    Process YAML file and update switch configuration data
+    """
+    for yaml_file in args.yaml:
+        try:
+            with open(yaml_file, 'r') as stream:
+                if yaml.__version__ >= "5.1":
+                    additional_data = yaml.full_load(stream)
+                else:
+                    additional_data = yaml.load(stream)
+                deep_update(data, FormatConverter.to_deserialized(additional_data))
+        except:
+            err_msg = f"Error occured while processing {yaml_file} file"
+            syslog.syslog(syslog.LOG_ERR, err_msg)
+            print(err_msg)
 
 def _get_jinja2_env(paths):
     """
@@ -317,16 +360,7 @@ def main():
 
     _process_json(args, data)
 
-    if args.yang is not None:
-        #TODO: Remove this check onces SONiC moves to python3.x
-        if PY3x:
-            yang_file = args.yang
-            config_db_json = SonicYangCfgDbGenerator().generate_config(
-                yang_data_file=yang_file)
-            deep_update(data, config_db_json)
-        else:
-            print('-Y/--yang option is not available in Python2', file=sys.stderr)
-            sys.exit(1)
+    _process_yang(args, data)
 
     if args.minigraph is not None:
         minigraph = args.minigraph
@@ -341,13 +375,7 @@ def main():
     if args.device_description is not None:
         deep_update(data, parse_device_desc_xml(args.device_description))
 
-    for yaml_file in args.yaml:
-        with open(yaml_file, 'r') as stream:
-            if yaml.__version__ >= "5.1":
-                additional_data = yaml.full_load(stream)
-            else:
-                additional_data = yaml.load(stream)
-            deep_update(data, FormatConverter.to_deserialized(additional_data))
+    _process_yaml(args, data)
 
     if args.additional_data is not None:
         deep_update(data, json.loads(args.additional_data))
