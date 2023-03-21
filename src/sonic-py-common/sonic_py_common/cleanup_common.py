@@ -1,6 +1,7 @@
 import yaml
 import re
 import os
+import syslog
 
 PATH_BUILD_METADATA = "/etc/sonic/build_metadata.yaml"
 PATH_CONFIG = "/sonic/rules/config"
@@ -26,15 +27,19 @@ def read_rules_config(path = None):
 
     dict = {}
 
-    for line in file:
-        # non empty line and not comment
-        if re.search("^$", line) is None and \
-            re.search("^#", line) is None:
-            line = line.replace("?=", "=", 1)
-            # clear from spaces
-            line = line.replace(" ", "")
-            key_value = line.split("=")
-            dict[key_value[0]] = key_value[1]
+    try:
+        for line in file:
+            # non empty line and not comment
+            if re.search("^$", line) is None and \
+                re.search("^#", line) is None:
+                line = line.replace("?=", "=", 1)
+                # clear from spaces
+                line = line.replace(" ", "")
+                key_value = line.split("=")
+                dict[key_value[0]] = key_value[1]
+    except:
+        err_msg = "Error with reading configuration\nConfig file: {}\nResult: {}".format(file, dict)
+        syslog.syslog(syslog.LOG_ERR, err_msg)
 
     return dict
 
@@ -48,26 +53,31 @@ def read_metadata_conifg(key_pattern = "", value_pattern = "", path = None):
 
     if path is None:
         path = PATH_BUILD_METADATA
-    
-    # Check if path exists
-    if os.path.exists(path) is True:
-        with open(path) as file:
-            config = yaml.safe_load(file)
-        config = config['configuration']
-    # probably this is build unit test
-    # read rules/config from sonic-buildimage
-    else:
-        config = {}
-        config = read_rules_config(PATH_CONFIG)
-        config_user = read_rules_config(PATH_CONFIG_USER)
-        if config_user is not None:
-            config.update(config_user)
 
-    for key in list(config):
-        if re.search(key_pattern, key) is None or \
-            (re.search(key_pattern, key) is not None and \
-            re.search(value_pattern, config[key]) is None):
-            del config[key]
+    config = {}
+
+    try:
+        # Check if path exists
+        if os.path.exists(path) is True:
+            with open(path) as file:
+                config = yaml.safe_load(file)
+            config = config['configuration']
+        # probably this is build unit test
+        # read rules/config from sonic-buildimage
+        else:
+            config = read_rules_config(PATH_CONFIG)
+            config_user = read_rules_config(PATH_CONFIG_USER)
+            if config_user is not None:
+                config.update(config_user)
+
+        for key in list(config):
+            if re.search(key_pattern, key) is None or \
+                (re.search(key_pattern, key) is not None and \
+                re.search(value_pattern, config[key]) is None):
+                del config[key]
+    except:
+        err_msg = "Error with reading metadata\nResult: {}".format(config)
+        syslog.syslog(syslog.LOG_ERR, err_msg)
 
     return config
 
@@ -82,16 +92,20 @@ def read_map(keys, path = None):
     if keys is None or os.path.exists(path) is False:
         return []
 
-    with open(path) as file:
-        map = yaml.safe_load(file)
+    try:
+        with open(path) as file:
+            map = yaml.safe_load(file)
 
-    values = []
-    for key in keys:
-        if key in map:
-            values.extend(map[key])
+        values = []
+        for key in keys:
+            if key in map:
+                values.extend(map[key])
 
-    # remove empty strings
-    values = list(filter(None, values))
+        # remove empty strings
+        values = list(filter(None, values))
+    except:
+        err_msg = "Error with reading key map\nKey-map file: {}\nResult: {}".format(map, values)
+        syslog.syslog(syslog.LOG_ERR, err_msg)
 
     return values
 
@@ -102,14 +116,18 @@ def rm_top_nested_key(dict, key):
     e.g. BGP_NEIGHBOR
     '''
 
-    if "." in key:
-        keys_splitted = key.split(".", 1)
-        if keys_splitted[0] in dict:
-            dict = dict[keys_splitted[0]]
-            key = keys_splitted[1]
-            rm_top_nested_key(dict, key)
-    else:
-        dict.pop(key, None)
+    try:
+        if "." in key:
+            keys_splitted = key.split(".", 1)
+            if keys_splitted[0] in dict:
+                dict = dict[keys_splitted[0]]
+                key = keys_splitted[1]
+                rm_top_nested_key(dict, key)
+        else:
+            dict.pop(key, None)
+    except:
+        err_msg = "Error with key removing\nKey: {}\nDictionary: {}".format(key, dict)
+        syslog.syslog(syslog.LOG_ERR, err_msg)
 
 def clean_cfggen_dict(dict, keys):
     '''
@@ -122,5 +140,9 @@ def clean_cfggen_dict(dict, keys):
     if keys is None:
         return
 
-    for key in keys:
-        rm_top_nested_key(dict, key)
+    try:
+        for key in keys:
+            rm_top_nested_key(dict, key)
+    except:
+        err_msg = "Error with cleaning config\nConfig: {}\nKeys: ".format(dict, keys)
+        syslog.syslog(syslog.LOG_ERR, err_msg)

@@ -200,9 +200,13 @@ def deep_update(dst, src, cleanup = False):
                 d[key] = value
 
     if cleanup:
-        disabled_flags = list(cleanup_common.read_metadata_conifg(key_pattern="INCLUDE_", value_pattern="^n$"))
-        keys_list = cleanup_common.read_map(disabled_flags)
-        cleanup_common.clean_cfggen_dict(dst, keys_list)
+        try:
+            disabled_flags = list(cleanup_common.read_metadata_conifg(key_pattern="INCLUDE_", value_pattern="^n$"))
+            keys_list = cleanup_common.read_map(disabled_flags)
+            cleanup_common.clean_cfggen_dict(dst, keys_list)
+        except:
+            err_msg = "Error occurred with config cleanup\nConfig: {}".format(dst)
+            syslog.syslog(syslog.LOG_ERR, err_msg)
 
     return dst
 
@@ -234,7 +238,7 @@ def _process_json(args, data):
             with open(json_file, 'r') as stream:
                 deep_update(data, FormatConverter.to_deserialized(json.load(stream)))
         except:
-            err_msg = "Error occured while processing {} file".format(json_file)
+            err_msg = "Error occurred while processing {} file".format(json_file)
             syslog.syslog(syslog.LOG_ERR, err_msg)
             print(err_msg)
 
@@ -254,7 +258,7 @@ def _process_yang(args, data):
                 print('-Y/--yang option is not available in Python2', file=sys.stderr)
                 sys.exit(1)
         except:
-            err_msg = "Error occured while processing {} file".format(yang_file)
+            err_msg = "Error occurred while processing {} file".format(yang_file)
             syslog.syslog(syslog.LOG_ERR, err_msg)
             print(err_msg)
 
@@ -271,7 +275,7 @@ def _process_yaml(args, data):
                     additional_data = yaml.load(stream)
                 deep_update(data, FormatConverter.to_deserialized(additional_data))
         except:
-            err_msg = "Error occured while processing {} file".format(yaml_file)
+            err_msg = "Error occurred while processing {} file".format(yaml_file)
             syslog.syslog(syslog.LOG_ERR, err_msg)
             print(err_msg)
 
