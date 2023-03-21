@@ -234,7 +234,7 @@ def _process_json(args, data):
             with open(json_file, 'r') as stream:
                 deep_update(data, FormatConverter.to_deserialized(json.load(stream)))
         except:
-            err_msg = f"Error occured while processing {json_file} file"
+            err_msg = "Error occured while processing {} file".format(json_file)
             syslog.syslog(syslog.LOG_ERR, err_msg)
             print(err_msg)
 
@@ -254,7 +254,7 @@ def _process_yang(args, data):
                 print('-Y/--yang option is not available in Python2', file=sys.stderr)
                 sys.exit(1)
         except:
-            err_msg = f"Error occured while processing {yang_file} file"
+            err_msg = "Error occured while processing {} file".format(yang_file)
             syslog.syslog(syslog.LOG_ERR, err_msg)
             print(err_msg)
 
@@ -271,7 +271,7 @@ def _process_yaml(args, data):
                     additional_data = yaml.load(stream)
                 deep_update(data, FormatConverter.to_deserialized(additional_data))
         except:
-            err_msg = f"Error occured while processing {yaml_file} file"
+            err_msg = "Error occured while processing {} file".format(yaml_file)
             syslog.syslog(syslog.LOG_ERR, err_msg)
             print(err_msg)
 
