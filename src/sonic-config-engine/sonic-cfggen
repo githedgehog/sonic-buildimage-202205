@@ -370,19 +370,19 @@ def main():
         minigraph = args.minigraph
         if platform:
             if args.port_config is not None:
-                deep_update(data, parse_xml(minigraph, platform, args.port_config, asic_name=asic_name, hwsku_config_file=args.hwsku_config))
+                deep_update(data, parse_xml(minigraph, platform, args.port_config, asic_name=asic_name, hwsku_config_file=args.hwsku_config), cleanup=True)
             else:
-                deep_update(data, parse_xml(minigraph, platform, asic_name=asic_name))
+                deep_update(data, parse_xml(minigraph, platform, asic_name=asic_name), cleanup=True)
         else:
-            deep_update(data, parse_xml(minigraph, port_config_file=args.port_config, asic_name=asic_name, hwsku_config_file=args.hwsku_config))
+            deep_update(data, parse_xml(minigraph, port_config_file=args.port_config, asic_name=asic_name, hwsku_config_file=args.hwsku_config), cleanup=True)
 
     if args.device_description is not None:
-        deep_update(data, parse_device_desc_xml(args.device_description))
+        deep_update(data, parse_device_desc_xml(args.device_description), cleanup=True)
 
     _process_yaml(args, data)
 
     if args.additional_data is not None:
-        deep_update(data, json.loads(args.additional_data))
+        deep_update(data, json.loads(args.additional_data), cleanup=True)
 
     if args.from_db:
         use_unix_sock = True if os.getuid() == 0 else False
@@ -393,7 +393,7 @@ def main():
             configdb = ConfigDBPipeConnector(use_unix_socket_path=use_unix_sock, namespace=args.namespace, **db_kwargs)
 
         configdb.connect()
-        deep_update(data, FormatConverter.db_to_output(configdb.get_config()))
+        deep_update(data, FormatConverter.db_to_output(configdb.get_config()), cleanup=True)
 
 
     # the minigraph file must be provided to get the mac address for backend asics
@@ -428,7 +428,7 @@ def main():
             else:
                 hardware_data['DEVICE_METADATA']['localhost'].update(asic_id=device_id)
 
-        deep_update(data, hardware_data)
+        deep_update(data, hardware_data, cleanup=True)
 
     paths = ['/', '/usr/share/sonic/templates']
     if args.template_dir:
@@ -442,7 +442,7 @@ def main():
             template = env.get_template(os.path.basename(template_file))
             template_data = template.render(data)
             if dest_file == "config-db":
-                deep_update(data, FormatConverter.to_deserialized(json.loads(template_data)))
+                deep_update(data, FormatConverter.to_deserialized(json.loads(template_data)), cleanup=True)
             else:
                 with smart_open(dest_file, 'w') as df:
                     print(template_data, file=df)
