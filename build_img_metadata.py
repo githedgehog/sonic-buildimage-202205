@@ -7,7 +7,7 @@ import re
 
 RULES_CFG_PATH = 'rules/config'
 RULES_CFG_USER_PATH = 'rules/config.user'
-IMG_METADATA_FILE = 'build_metadata.yaml'
+IMG_METADATA_FILE = 'build_metadata.yml'
 
 #
 # Helper functions

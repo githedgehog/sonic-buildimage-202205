@@ -3,7 +3,7 @@ import re
 import os
 import syslog
 
-PATH_BUILD_METADATA = "/etc/sonic/build_metadata.yaml"
+PATH_BUILD_METADATA = "/etc/sonic/build_metadata.yml"
 PATH_CONFIG = "/sonic/rules/config"
 PATH_CONFIG_USER = PATH_CONFIG + ".user"
 PATH_FLAG_TO_KEY_MAP = "/etc/sonic/flags_to_keys_map.yaml"

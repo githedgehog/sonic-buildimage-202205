@@ -608,8 +608,8 @@ export image_usecase="${IMAGE_USECASE}"
 export image_options="${IMAGE_OPTIONS}"
 
 ./build_img_metadata.py
-if [ -f ./build_metadata.yaml ]; then
-    sudo cp ./build_metadata.yaml $FILESYSTEM_ROOT/etc/sonic/
+if [ -f ./build_metadata.yml ]; then
+    sudo cp ./build_metadata.yml $FILESYSTEM_ROOT/etc/sonic/
 fi
 
 ## Copy over clean-up script
